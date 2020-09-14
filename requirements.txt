@@ -8,6 +8,8 @@ mccabe==0.6.1
 pep8-naming==0.11.1
 pycodestyle==2.6.0
 pyflakes==2.2.0
+numpy==1.19.2
+opencv-python==4.4.0.42
 pylint==2.6.0
 six==1.15.0
 toml==0.10.1
