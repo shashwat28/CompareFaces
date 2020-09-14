@@ -1,5 +1,0 @@
-"""
-Test Program
-"""
-
-print('hello')
