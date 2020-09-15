@@ -1,4 +1,5 @@
 .vscode
 .custom_env
 *.pyc
+__pycache__
 data/processed
