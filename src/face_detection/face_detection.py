@@ -14,7 +14,7 @@ def scaled_image(img):
     return faces
 
 
-def extract_bounded_faces(img, faces, FACE_CUTOUT_DIR):
+def extract_bounded_faces(img, faces, processed_dir):
     '''cropping out the faces from the subject image using coordinates from
     the list returned of the scaled_image method'''
     name_counter = 0
@@ -24,7 +24,7 @@ def extract_bounded_faces(img, faces, FACE_CUTOUT_DIR):
                       (255, 0, 0), 2)
         face_cutout = img[center_y:center_y + height,
                           center_x:center_x + width]
-        cv2.imwrite(os.path.join(FACE_CUTOUT_DIR,
+        cv2.imwrite(os.path.join(processed_dir,
                                  'img{}.jpg'.format(name_counter)),
                     face_cutout)
         name_counter = name_counter+1
