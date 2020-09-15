@@ -1,7 +1,6 @@
 """
 This module is for the Extraction of the Human Faces from a Original Images
 """
-
 import os
 import cv2
 
@@ -14,18 +13,34 @@ def scaled_image(img):
     return faces
 
 
-def extract_bounded_faces(img, faces, processed_dir):
-    '''cropping out the faces from the subject image using coordinates from
+def extract_bounded_faces_from_dir(image_dir: str):
+    '''Iterate through the Images of the directory'''
+    for image_name in os.listdir(image_dir):
+        input_path = os.path.join(image_dir, image_name)
+        extract_bounded_faces(input_path, image_name)
+
+
+def extract_bounded_faces(input_path: str, image_name: str):
+    '''Takes path of the image and exports the image with Image_name__X'''
+    image_to_scale = cv2.imread(input_path)
+    scaled_img = scaled_image(image_to_scale)
+    extract_bounded_faces_from_image(
+        image_to_scale, scaled_img, image_name, FACE_CUTOUT_DIR)
+
+
+def extract_bounded_faces_from_image(img, faces: list, image_path: str, processed_dir: str):
+    '''Cropping out the faces from the subject image using coordinates from
     the list returned of the scaled_image method'''
+
+    if(image_path is None or len(image_path) == 0):
+        image_path = "img"
+
     name_counter = 0
     for (center_x, center_y, width, height) in faces:
-        cv2.rectangle(img, (center_x, center_y),
-                      (center_x + width, center_y+height),
-                      (255, 0, 0), 2)
         face_cutout = img[center_y:center_y + height,
                           center_x:center_x + width]
         cv2.imwrite(os.path.join(processed_dir,
-                                 'img{}.jpg'.format(name_counter)),
+                                 image_path + '__{}.jpg'.format(name_counter)),
                     face_cutout)
         name_counter = name_counter+1
     cv2.waitKey(0)
@@ -42,9 +57,4 @@ if __name__ == "__main__":
     # loading the haar cascade pretrained classifier
     face_cascade = cv2.CascadeClassifier(PROJECT_PATH + MODEL_PATH)
 
-    # iterate through the names of contents of the folder
-    for image_path in os.listdir(IMAGE_DIR):
-        input_path = os.path.join(IMAGE_DIR, image_path)
-        image_to_scale = cv2.imread(input_path)
-        scaled_img = scaled_image(image_to_scale)
-        extract_bounded_faces(image_to_scale, scaled_img, FACE_CUTOUT_DIR)
+    extract_bounded_faces_from_dir(IMAGE_DIR)
