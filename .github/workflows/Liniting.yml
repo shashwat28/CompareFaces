@@ -6,7 +6,14 @@ name: Python application
 on:
   push:
     branches: [ master ]
+    paths: 
+      - '**.py'
   pull_request:
+    paths: 
+      - '**.py'
+  workflow_dispatch:
+    paths: 
+      - '**.py'
 
 jobs:
   build:
