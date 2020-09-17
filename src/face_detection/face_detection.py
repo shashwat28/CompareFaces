@@ -90,19 +90,71 @@ def crop_bounded_box_from_image(
     for (center_x, center_y, width, height) in bounding_boxes:
         face_cutout = img[center_y:center_y + height,
                           center_x:center_x + width]
+        result_filename = create_nested_directories(
+            processed_dir, ["BoundedFaces", result_prefix])
         result_filename = os.path.join(
-            processed_dir, result_prefix + '__{}.jpg'.format(name_counter))
+            result_filename, "{}.jpg".format(name_counter))
         if not cv2.imwrite(result_filename, face_cutout):
             print(result_filename + " not saved")
         name_counter = name_counter+1
 
 
-if __name__ == '__main__':
+def create_nested_directories(parent_path: str, dir_name_list: list) -> str:
+    """Create a series of Nested directories inside the parent_path
+
+    Args:
+        parent_path (str): Directory where generated directories
+        will be created
+        dir_name_list (list): List of directorie names where each
+        directory is created inside another
+
+    Returns:
+        str: Path to innermost created directory
+    """
+    copy = parent_path + ""
+    for dir_name in dir_name_list:
+        if not create_directory(copy, dir_name):
+            break
+        copy = os.path.join(copy, dir_name)
+    return copy
+
+
+def create_directory(
+        parent_path: str, dir_name: str, verbosity: bool = False) -> bool:
+    """Creates a "dir_name" directory in "parent_path" directory,
+    suppresses  FileExistsError and,
+    return True, if required directory is generated/exists,
+    otherwise return False
+
+    Args:
+        parent_path (str): Path to Target Directory,
+        where new directory is needed to be created
+        dir_name (str): Name of new directory
+        verbosity (bool, optional): Prints error if Found, Defaults to False.
+
+    Returns:
+        bool: Returns True, if desired directory is created/exists,
+        otherwise False
+    """
+    try:
+        os.mkdir(os.path.join(parent_path, dir_name), mode=0o771)
+    except FileExistsError:
+        pass
+    except FileNotFoundError:
+        if verbosity:
+            print("Target directory does not exist")
+        return False
+    return True
+
+
+if __name__ == "__main__":
     PROJECT_PATH = ""
     MODEL_PATH = os.path.join(
         PROJECT_PATH,
         "model/face_detection/haarcascade_frontalface_default.xml")
     IMAGE_SOURCE_PATH = os.path.join(PROJECT_PATH, "data/raw/images")
+    create_nested_directories(os.path.join(
+        PROJECT_PATH, 'data'), ["processed", "images"])
     EXPORT_PATH = os.path.join(PROJECT_PATH, "data/processed/images")
 
     extract_bounded_faces_from_dir(IMAGE_SOURCE_PATH)
